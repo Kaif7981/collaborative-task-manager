@@ -7,34 +7,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String
-  createdAt DateTime @default(now())
-
-  // Relations
-  createdTasks  Task[] @relation("CreatedTasks")
-  assignedTasks Task[] @relation("AssignedTasks")
-}
-
-model Task {
-  id           String       @id @default(uuid())
-  title        String       @db.VarChar(100)
-  description  String
-  dueDate      DateTime
-  priority     TaskPriority
-  status       TaskStatus
-
-  creatorId    String
-  assignedToId String
-
-  creator      User @relation("CreatedTasks", fields: [creatorId], references: [id])
-  assignee     User @relation("AssignedTasks", fields: [assignedToId], references: [id])
-
-  createdAt    DateTime     @default(now())
-}
+//////////////////////////////////////////////////////
+// ENUMS
+//////////////////////////////////////////////////////
 
 enum TaskPriority {
   LOW
@@ -48,4 +23,38 @@ enum TaskStatus {
   IN_PROGRESS
   REVIEW
   COMPLETED
+}
+
+//////////////////////////////////////////////////////
+// MODELS
+//////////////////////////////////////////////////////
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+
+  // Relations
+  createdTasks  Task[] @relation("CreatedTasks")
+  assignedTasks Task[] @relation("AssignedTasks")
+}
+
+model Task {
+  id           String        @id @default(uuid())
+  title        String        @db.VarChar(100)
+  description  String
+  dueDate      DateTime
+  priority     TaskPriority
+  status       TaskStatus    @default(TODO)
+
+  creatorId    String
+  assignedToId String?
+
+  creator      User          @relation("CreatedTasks", fields: [creatorId], references: [id])
+  assignedTo   User?         @relation("AssignedTasks", fields: [assignedToId], references: [id])
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
